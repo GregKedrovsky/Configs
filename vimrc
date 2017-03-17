@@ -26,3 +26,5 @@ set tabstop=4
 " Change the color scheme
 set t_Co=256
 colorscheme gman1
+
+" End
