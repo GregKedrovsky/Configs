@@ -1,0 +1,9 @@
+http://www.in-ulm.de/~mascheck/various/shebang/#blankrequired
+
+The shebang (SHarp bang):
+
+    #! /bin/sh
+
+Put the shebang at the left margin of the first line of your shell scripts. Blanks after ! are OK (optional but not necessary).  Use a complete pathname (no search is done). At the moment the whole line is restricted to 16 characters but this limit will be raised.
+
+https://en.wikipedia.org/wiki/Shebang_(Unix)

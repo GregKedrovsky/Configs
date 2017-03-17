@@ -1,0 +1,52 @@
+Slackware sendmail configs
+
+SMTP Authentication Required (inMotion Hosting):
+http://www.inmotionhosting.com/support/email/general-information/getting-started-guide-email
+
+HowTo: 
+http://www.linuxquestions.org/questions/slackware-14/sendmail-smtp-auth-howto-224543/
+- error: makemap hash /etc/mail/authinfo < /etc/mail/authinfo 
+- should be: makemap hash /etc/mail/authinfo.db < /etc/mail/authinfo
+
+Maquerading:
+http://www.dummies.com/programming/networking/network-administration-configuring-sendmail/
+
+
+My sendmail-inmotion.mc file:
+
+include(`../m4/cf.m4')
+VERSIONID(`GAK setup for SlackHead')dnl
+OSTYPE(`linux')dnl
+dnl# These settings help protect against people verifying email addresses
+dnl# at your site in order to send you email that you probably don't want:
+define(`confPRIVACY_FLAGS', `authwarnings,novrfy,noexpn,restrictqrun')dnl
+MASQUERADE_AS(`kedrovsky.net')dnl
+FEATURE(masquerade_envelope)dnl
+FEATURE(masquerade_entire_domain)dnl
+MASQUERADE_DOMAIN(`kedrovsky.net')dnl
+dnl# Uncomment the line below to send outgoing mail through an external server:
+define(`SMART_HOST',`mail.kedrovsky.net')dnl
+dnl# No timeout for ident:
+define(`confTO_IDENT', `0')dnl
+dnl# Enable the line below to use smrsh to restrict what sendmail can run:
+dnl FEATURE(`smrsh',`/usr/sbin/smrsh')dnl
+dnl# See the README in /usr/share/sendmail/cf for a ton of information on
+dnl# how these options work:
+FEATURE(`authinfo', `hash -o /etc/mail/authinfo.db')dnl
+FEATURE(`use_cw_file')dnl
+FEATURE(`use_ct_file')dnl
+FEATURE(`mailertable',`hash -o /etc/mail/mailertable.db')dnl
+FEATURE(`virtusertable',`hash -o /etc/mail/virtusertable.db')dnl
+FEATURE(`access_db', `hash -T /etc/mail/access')dnl
+FEATURE(`blacklist_recipients')dnl
+FEATURE(`local_procmail',`',`procmail -t -Y -a $h -d $u')dnl
+FEATURE(`always_add_domain')dnl
+FEATURE(`redirect')dnl
+dnl# Turn this feature on if you don't always have DNS, or enjoy junk mail:
+dnl FEATURE(`accept_unresolvable_domains')dnl
+EXPOSED_USER(`root')dnl
+dnl# Also accept mail for localhost.localdomain:
+LOCAL_DOMAIN(`localhost.localdomain')dnl
+MAILER(local)dnl
+MAILER(smtp)dnl
+MAILER(procmail)dnl

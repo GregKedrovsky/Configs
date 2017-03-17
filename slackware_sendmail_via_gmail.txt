@@ -1,0 +1,123 @@
+Sendmail Client Setup Slackware 14.1 - GMail
+
+-----
+1. Create a new mc file for the GMail config:
+    cd /usr/share/sendmail/cf/cf/
+    vim sendmail-gmail.mc
+
+Code: 
+
+dnl# This is the default sendmail .mc file for Slackware. To generate
+dnl# the sendmail.cf file from this (perhaps after making some changes),
+dnl# use the m4 files in /usr/share/sendmail/cf like this:
+dnl#
+dnl# cp sendmail-slackware.mc /usr/share/sendmail/cf/config.mc
+dnl# cd /usr/share/sendmail/cf
+dnl# sh Build config.cf
+dnl#
+dnl# You may then install the resulting .cf file:
+dnl# cp config.cf /etc/mail/sendmail.cf
+dnl#
+include(`../m4/cf.m4')
+VERSIONID(`default setup for Slackware Linux')dnl
+OSTYPE(`linux')dnl
+dnl# These settings help protect against people verifying email addresses
+dnl# at your site in order to send you email that you probably don't want:
+define(`confPRIVACY_FLAGS', `authwarnings,novrfy,noexpn,restrictqrun')dnl
+dnl# Uncomment the line below to send outgoing mail through an external server:
+dnl define(`SMART_HOST',`mailserver.example.com')
+dnl# No timeout for ident:
+define(`confTO_IDENT', `0')dnl
+dnl# Enable the line below to use smrsh to restrict what sendmail can run:
+dnl FEATURE(`smrsh',`/usr/sbin/smrsh')dnl
+dnl# See the README in /usr/share/sendmail/cf for a ton of information on
+dnl# how these options work:
+FEATURE(`use_cw_file')dnl
+FEATURE(`use_ct_file')dnl
+FEATURE(`mailertable',`hash -o /etc/mail/mailertable.db')dnl
+FEATURE(`virtusertable',`hash -o /etc/mail/virtusertable.db')dnl
+FEATURE(`access_db', `hash -T /etc/mail/access')dnl
+FEATURE(`blacklist_recipients')dnl
+FEATURE(`local_procmail',`',`procmail -t -Y -a $h -d $u')dnl
+FEATURE(`always_add_domain')dnl
+FEATURE(`redirect')dnl
+dnl# Turn this feature on if you don't always have DNS, or enjoy junk mail:
+dnl FEATURE(`accept_unresolvable_domains')dnl
+EXPOSED_USER(`root')dnl
+dnl# Also accept mail for localhost.localdomain:
+LOCAL_DOMAIN(`localhost.localdomain')dnl
+define(`SMART_HOST',`[smtp.gmail.com]')dnl
+define(`RELAY_MAILER_ARGS', `TCP $h 587')dnl
+define(`ESMTP_MAILER_ARGS', `TCP $h 587')dnl
+define(`confAUTH_OPTIONS', `A p')dnl
+TRUST_AUTH_MECH(`EXTERNAL DIGEST-MD5 CRAM-MD5 LOGIN PLAIN')dnl
+define(`confAUTH_MECHANISMS', `EXTERNAL GSSAPI DIGEST-MD5 CRAM-MD5 LOGIN PLAIN')dnl
+FEATURE(`authinfo',`hash -o /etc/mail/authinfo/gmail-auth.db')dnl
+MAILER(local)dnl
+MAILER(smtp)dnl
+MAILER(procmail)dnl
+
+-----
+2. Compile: (need root permissions)
+    m4 sendmail-gmail.mc > sendmail.cf
+    mv /etc/mail/sendmail.cf /etc/mail/sendmail.cf.old
+    cp /usr/share/sendmail/cf/cf/sendmail.cf /etc/mail/.
+
+-----
+3. Make /etc/mail/authinfo directory
+    mkdir /etc/mail/authinfo
+    cd /etc/mail/authinfo
+
+-----
+4. Create file gmail-auth.txt
+    vim gmail-auth.txt
+    Put this line of code in it: 
+
+Code:
+
+AuthInfo: "U:root" "I:youremail@gmail.com" "P:yourpassword"
+
+-----
+5. Create db:
+    makemap -r hash gmail-auth.db < gmail-auth.txt
+
+-----
+6. Set permissions TIGHT for the authinfo directory:
+    chmod 700 /etc/mail/authinfo
+
+-----
+7. Check perms:
+    bash-4.2# ls -la
+
+Should return... 
+total 24
+drwx------ 2 root root 4096 Jan 26 22:30 .
+drwxr-xr-x 3 root root 4096 Jan 26 22:35 ..
+-rw-r----- 1 root root 12288 Jan 26 22:30 gmail-auth.db
+rw-r--r-- 1 root root 57 Jan 26 22:30 gmail-auth.txt
+
+
+-----
+8. Start or restart (stop/start) sendmail: 
+    $ sudo /etc/rc.d/rc.sendmail start
+
+-----
+9. Sign in to GMail and adjust settings:
+a. Gear Icon -->Settings-->Forwarding and POP
+b. Enable IMAP
+c. Go back you your email main page-->Your user Icon-->My Account-->Connected apps & sites
+d. ... or  https://www.google.com/settings/security/lesssecureapps
+e. Allow less secure apps: ON
+f. When you send an email via sendmail to GMail you'll get blocked and then GMail will send you an email telling you about it and allow you to add it to your "Apps connected to your account"
+
+-----
+10. When its working, make sendmail executable (to start on boot):
+    $ sudo chmod 755 /etc/rc.d/rc.sendmail
+
+-----
+11. Test mail to yourself (in terminal):
+a. $ sendmail -v youremail@gmail.com
+b. subject:test
+c. hello world
+d. .
+e. (period on last line to stop input, close and send)
