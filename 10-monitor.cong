@@ -1,0 +1,15 @@
+# Place in /etc/X11/xorg.conf.d/
+# Blanks the screens at 30mins and turns off monitors at 60mins
+
+Section "Monitor"
+	Identifier "Monitor0"
+	Option "DPMS" "true"
+EndSection 
+
+Section "ServerLayout"
+	Identifier "X.org configured"
+	Option "StandbyTime" "0"
+	Option "SuspendTime" "0"
+	Option "BlankTime"   "30"
+	Option "OffTime"     "60"
+EndSection
