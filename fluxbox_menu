@@ -1,0 +1,35 @@
+## NOTE: This is mostly to remember the wallpaper setting. feh --bg-tile stretches the image over both my monitors
+
+[begin] (Fluxbox-1.3.7)
+    [exec] (xterm) {xterm}
+    [exec] (term) {xfce4-terminal --show-borders}
+    [exec] (term left) {xfce4-terminal --show-borders --geometry=118x62+0+0}
+    [exec] (term right) {xfce4-terminal --show-borders --geometry=118x62+960+0}
+    [exec] (mousepad) {mousepad}
+    [exec] (pinta) {pinta}
+    [separator]
+    [exec] (chromium) {chromium}
+    [exec] (firefox) {firefox}
+    [exec] (volume) {xfce4-terminal --command alsamixer}
+    [exec] (thunar) {thunar}
+    [separator]
+    [reconfig] (Reload config)
+[submenu] (Wallpaper)
+    [wallpapers] (/home/greg/.fluxbox/backgrounds) {feh --bg-tile}
+[end]
+[submenu] (Fluxbox menu)
+    [config] (Configure)
+[submenu] (System Styles) {Choose a style...}
+    [stylesdir] (/usr/share/fluxbox/styles)
+[end]
+[submenu] (User Styles) {Choose a style...}
+    [stylesdir] (~/.fluxbox/styles)
+[end]
+    [workspaces] (Workspace List)
+    [commanddialog] (Fluxbox Command)
+    [restart] (Restart)
+    [exec] (About) {(fluxbox -v; fluxbox -info | sed 1d) | xmessage -file - -center}
+[end]
+[separator]
+[exit] (Exit)
+[end]
