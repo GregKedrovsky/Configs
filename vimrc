@@ -27,4 +27,7 @@ set tabstop=4
 set t_Co=256
 colorscheme gman1
 
+" Disable autocomment character insertion
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+
 " End
